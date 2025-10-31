@@ -1,0 +1,96 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyN0ipxjsCfUdlfKlWYGv1yJ",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/11239A054/dbs-lab/blob/main/11239A054Ex%20no-6c\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 2,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "RhPn-lIIv7ai",
+        "outputId": "3518de02-09f3-463e-d45c-4d3780691ad2"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Enter the value of n (prime number): 9\n",
+            "Enter the value of g (generator): 9\n",
+            "Enter the value of x for the first person: 6\n",
+            "Enter the value of y for the second person: 14\n",
+            "\n",
+            "Key for the first person is: 0\n",
+            "Key for the second person is: 0\n",
+            "✅ The shared secret key is established successfully!\n"
+          ]
+        }
+      ],
+      "source": [
+        "def power(a, b, mod):\n",
+        "    \"\"\"Calculates (a^b) % mod using recursive exponentiation by squaring.\"\"\"\n",
+        "    if b == 0:\n",
+        "        return 1\n",
+        "    t = power(a, b // 2, mod)\n",
+        "    if b % 2 == 0:\n",
+        "        return (t * t) % mod\n",
+        "    else:\n",
+        "        return ((t * t) % mod * a) % mod\n",
+        "\n",
+        "\n",
+        "def main():\n",
+        "    # Input values\n",
+        "    n = int(input(\"Enter the value of n (prime number): \"))\n",
+        "    g = int(input(\"Enter the value of g (generator): \"))\n",
+        "\n",
+        "    x = int(input(\"Enter the value of x for the first person: \"))\n",
+        "    a = power(g, x, n)\n",
+        "\n",
+        "    y = int(input(\"Enter the value of y for the second person: \"))\n",
+        "    b = power(g, y, n)\n",
+        "\n",
+        "    # Calculate the shared keys\n",
+        "    key1 = power(b, x, n)  # Key for the first person\n",
+        "    key2 = power(a, y, n)  # Key for the second person\n",
+        "\n",
+        "    print(f\"\\nKey for the first person is: {key1}\")\n",
+        "    print(f\"Key for the second person is: {key2}\")\n",
+        "\n",
+        "    if key1 == key2:\n",
+        "        print(\"✅ The shared secret key is established successfully!\")\n",
+        "    else:\n",
+        "        print(\"❌ Keys do not match — something went wrong.\")\n",
+        "\n",
+        "\n",
+        "if __name__ == \"__main__\":\n",
+        "    main()\n"
+      ]
+    }
+  ]
+}
