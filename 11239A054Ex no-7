@@ -1,0 +1,166 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyP83I51HFICSdSFFXAt6IIE",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/11239A054/dbs-lab/blob/main/11239A054Ex%20no-7\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 1,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "ZgJTH_wZxk4e",
+        "outputId": "b7e243b5-fe32-488c-c213-565174760ced"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "\n",
+            "--- Simulation of Digital Signature Algorithm (DSA) ---\n",
+            "\n",
+            "Global public key components:\n",
+            "p = 10601\n",
+            "q = 53\n",
+            "g = 1049\n",
+            "\n",
+            "Secret information:\n",
+            "x (private) = 25\n",
+            "y (public)  = 9650\n",
+            "\n",
+            "Generating digital signature:\n",
+            "k (random) = 34\n",
+            "Hash value = 4115\n",
+            "r = 4\n",
+            "s = 32\n",
+            "\n",
+            "Verifying digital signature (checkpoints):\n",
+            "w  = 5\n",
+            "u1 = 11\n",
+            "u2 = 20\n",
+            "v  = 4\n",
+            "\n",
+            "✅ Success: Digital signature verified! (r = 4)\n",
+            "\n"
+          ]
+        }
+      ],
+      "source": [
+        "import random\n",
+        "from sympy import isprime, mod_inverse\n",
+        "\n",
+        "\n",
+        "class DSAAlg:\n",
+        "    one = 1\n",
+        "    zero = 0\n",
+        "\n",
+        "    @staticmethod\n",
+        "    def get_next_prime(ans):\n",
+        "        \"\"\"Get next prime greater than or equal to 'ans'.\"\"\"\n",
+        "        test = int(ans)\n",
+        "        while not isprime(test):\n",
+        "            test += 1\n",
+        "        return test\n",
+        "\n",
+        "    @staticmethod\n",
+        "    def find_q(n):\n",
+        "        \"\"\"Find a small prime factor of n.\"\"\"\n",
+        "        start = 2\n",
+        "        while not isprime(n):\n",
+        "            while n % start != 0:\n",
+        "                start += 1\n",
+        "            n //= start\n",
+        "        return n\n",
+        "\n",
+        "    @staticmethod\n",
+        "    def get_gen(p, q):\n",
+        "        \"\"\"Find generator g for given p and q.\"\"\"\n",
+        "        h = random.randint(2, p - 2)\n",
+        "        g = pow(h, (p - 1) // q, p)\n",
+        "        if g == 1:\n",
+        "            return DSAAlg.get_gen(p, q)\n",
+        "        return g\n",
+        "\n",
+        "    @staticmethod\n",
+        "    def main():\n",
+        "        print(\"\\n--- Simulation of Digital Signature Algorithm (DSA) ---\\n\")\n",
+        "\n",
+        "        # Step 1: Generate p, q, g\n",
+        "        p = DSAAlg.get_next_prime(10600)  # approximate large prime\n",
+        "        q = DSAAlg.find_q(p - 1)\n",
+        "        g = DSAAlg.get_gen(p, q)\n",
+        "\n",
+        "        print(\"Global public key components:\")\n",
+        "        print(f\"p = {p}\")\n",
+        "        print(f\"q = {q}\")\n",
+        "        print(f\"g = {g}\")\n",
+        "\n",
+        "        # Step 2: Generate keys\n",
+        "        x = random.randint(1, q - 1)  # Private key\n",
+        "        y = pow(g, x, p)              # Public key\n",
+        "        print(\"\\nSecret information:\")\n",
+        "        print(f\"x (private) = {x}\")\n",
+        "        print(f\"y (public)  = {y}\")\n",
+        "\n",
+        "        # Step 3: Signing\n",
+        "        k = random.randint(1, q - 1)\n",
+        "        r = pow(g, k, p) % q\n",
+        "        hash_val = random.randint(1, p - 1)\n",
+        "        k_inv = mod_inverse(k, q)\n",
+        "        s = (k_inv * (hash_val + x * r)) % q\n",
+        "\n",
+        "        print(\"\\nGenerating digital signature:\")\n",
+        "        print(f\"k (random) = {k}\")\n",
+        "        print(f\"Hash value = {hash_val}\")\n",
+        "        print(f\"r = {r}\")\n",
+        "        print(f\"s = {s}\")\n",
+        "\n",
+        "        # Step 4: Verification\n",
+        "        w = mod_inverse(s, q)\n",
+        "        u1 = (hash_val * w) % q\n",
+        "        u2 = (r * w) % q\n",
+        "        v = ((pow(g, u1, p) * pow(y, u2, p)) % p) % q\n",
+        "\n",
+        "        print(\"\\nVerifying digital signature (checkpoints):\")\n",
+        "        print(f\"w  = {w}\")\n",
+        "        print(f\"u1 = {u1}\")\n",
+        "        print(f\"u2 = {u2}\")\n",
+        "        print(f\"v  = {v}\")\n",
+        "\n",
+        "        if v == r:\n",
+        "            print(f\"\\n✅ Success: Digital signature verified! (r = {r})\\n\")\n",
+        "        else:\n",
+        "            print(\"\\n❌ Error: Incorrect digital signature.\\n\")\n",
+        "\n",
+        "\n",
+        "if __name__ == \"__main__\":\n",
+        "    DSAAlg.main()\n"
+      ]
+    }
+  ]
+}
